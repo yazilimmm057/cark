@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mola Çarkı | KPSS Ders Molası & Sohbet Oyunu</title>
+  <meta name="description" content="1 Saat KPSS Çalışması, 15 Dakika Mola Çarkı! Üniversite kampüs sohbetleri, Tabu & Sır itirafları, eğlenceli meydan okumalar ve kahve iddiaları.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="yeniarkadas.css">
+</head>
+<body>
+  <!-- Canvas Efektleri -->
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- Üst Kontrol & Navigasyon -->
+    <header class="app-header">
+      <div class="top-nav-row">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <div class="tagline-badge">
+            <span class="live-dot"></span>
+            <span>☕ 1 SAAT DERS ➔ 15 DK ÇARK & SOHBET MOLASI 🎉</span>
+          </div>
+          <a href="yeniarkadas2.html" class="mode-switch-link" title="2. Seviye KPSS 85+ Net Seviyesine Geç">
+            <span>🎯 2. Etap (KPSS 85+ Net) →</span>
+          </a>
+        </div>
+        <div class="quick-tools">
+          <button id="sound-btn" class="tool-btn" title="Sesi Aç/Kapat"><span>🔊</span></button>
+          <button id="fullscreen-btn" class="tool-btn" title="Tam Ekran"><span>⛶</span></button>
+          <button id="history-btn" class="tool-btn" title="Geçmiş Görevler"><span>📜</span></button>
+          <button id="reset-btn" class="tool-btn danger" title="Oyunu Sıfırla"><span>🔄</span></button>
+        </div>
+      </div>
+
+      <div class="main-title-block">
+        <span class="title-sub">KPSS DERS MOLASI & SOHBET OYUNU</span>
+        <h1 class="main-title">MOLA ÇARKI</h1>
+      </div>
+
+      <!-- ================= 1 SAAT DERS & 15 DK MOLA ZAMANLAYICISI ================= -->
+      <div class="pomodoro-card" id="pomodoro-card">
+        <div class="pomo-info">
+          <div class="pomo-icon" id="pomo-icon">📚</div>
+          <div class="pomo-text-group">
+            <h3>
+              <span id="pomo-status-title">KPSS ODAK MODU</span>
+              <span class="pomo-badge badge-study" id="pomo-badge">1 SAAT</span>
+            </h3>
+            <p class="pomo-sub" id="pomo-sub-text">Süre bitince otomatik 15 dk çark molası başlar!</p>
+          </div>
+        </div>
+
+        <div class="pomo-timer-display" id="pomo-timer-display">
+          <span id="pomo-minutes">60</span>:<span id="pomo-seconds">00</span>
+        </div>
+
+        <div class="pomo-controls">
+          <button id="pomo-start-btn" class="pomo-btn primary">Başlat</button>
+          <button id="pomo-switch-btn" class="pomo-btn switch-mode-btn">Molaya Geç (15 Dk)</button>
+        </div>
+      </div>
+
+      <!-- ================= 2 KİŞİLİK OYUNCU ARENASI (1. Sude Hanım, 2. Sabri Bey) ================= -->
+      <div class="two-player-arena">
+        <!-- 1. Oyuncu: Sude Hanım (Sarışın) -->
+        <div class="player-card active-turn" id="p1-card">
+          <div class="player-avatar blonde-avatar" title="Sude Hanım (Sarışın)">
+            <span class="avatar-char">👱‍♀️</span>
+            <span class="avatar-tag-blonde" title="Sarışın">✨</span>
+          </div>
+          <div class="player-info">
+            <div class="player-name-row">
+              <span class="player-name" id="p1-name" title="İsmi değiştirmek için tıkla" style="cursor:pointer;">Sude Hanım</span>
+              <button class="name-edit-icon-btn" id="edit-p1-btn" title="Misafir Oyuncu İsmini Değiştir">✏️</button>
+              <span class="turn-badge" id="p1-turn">SIRADA</span>
+            </div>
+            <div class="player-stats">
+              <span class="stat-chip">🎯 <strong id="p1-score">0</strong> Puan</span>
+              <span class="stat-chip coffee">⚡ <strong id="p1-pass">0</strong> Pas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="vs-divider">
+          <span class="vs-pill">VS</span>
+          <button id="switch-turn-btn" class="turn-switch-btn" title="Sırayı Değiştir">⇄</button>
+        </div>
+
+        <!-- 2. Oyuncu: Sabri Bey (Kumral, Mavi Gözlü - Çanta Kesinlikle Yok!) -->
+        <div class="player-card" id="p2-card">
+          <div class="player-avatar kumral-avatar" title="Sabri Bey (Kumral, Mavi Gözlü)">
+            <span class="avatar-char">🧑</span>
+            <span class="avatar-tag-blue" title="Mavi Gözlü">💙</span>
+          </div>
+          <div class="player-info">
+            <div class="player-name-row">
+              <span class="player-name" id="p2-name" contenteditable="true" title="İsmi değiştirmek için tıkla">Sabri Bey</span>
+              <span class="turn-badge hidden" id="p2-turn">SIRADA</span>
+            </div>
+            <div class="player-stats">
+              <span class="stat-chip">🎯 <strong id="p2-score">0</strong> Puan</span>
+              <span class="stat-chip coffee">⚡ <strong id="p2-pass">0</strong> Pas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ================= ÇARK ALANI ================= -->
+    <main class="wheel-section">
+      <!-- Kategori Bilgi Hapları -->
+      <div class="category-legend">
+        <span class="cat-chip cat-taboo">🎭 Tabu & Sır</span>
+        <span class="cat-chip cat-flirt">✨ İlişki</span>
+        <span class="cat-chip cat-truth">💬 Doğruluk & İtiraf</span>
+        <span class="cat-chip cat-dare">⚡ Cesur Varsayım & Cesaret</span>
+        <span class="cat-chip cat-kpss">🎓 Kampüs & KPSS</span>
+        <span class="cat-chip cat-mystery">🎁 3 Gizemli Kutu</span>
+      </div>
+
+      <div class="wheel-outer-wrapper">
+        <div class="pointer-wrapper">
+          <div class="wheel-pointer" id="wheel-pointer">
+            <div class="pointer-gem"></div>
+          </div>
+        </div>
+
+        <div class="canvas-holder">
+          <canvas id="wheel-canvas" width="600" height="600"></canvas>
+          <div class="center-cap" id="center-spin-btn" title="Çevirmek için tıkla!">
+            <div class="inner-cap">
+              <span class="cap-sub">MOLA</span>
+              <span class="cap-spin-text">ÇEVİR</span>
+              <span class="cap-icon">☕</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spin-action-panel">
+        <button id="main-spin-btn" class="glow-spin-button">
+          <span class="btn-shine"></span>
+          <span>🎲</span>
+          <span>ÇARKI ÇEVİR (MOLA VAKTİ)</span>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= GENEL SORU & İTİRAF / TABU & SIR MODALI (Screenshot 4 Tasarımı) ================= -->
+  <div id="card-modal" class="modal-overlay hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header-row">
+        <span class="category-badge-pill badge-taboo" id="card-category-badge">🌙 MOLA & TABU</span>
+        <button class="modal-close-btn" data-close="card-modal">✕</button>
+      </div>
+
+      <!-- Oyuncu Sıra Barı (Screenshot 4 Gibi) -->
+      <div class="player-turn-banner" id="card-player-banner">
+        <span id="card-player-icon">👱‍♀️</span>
+        <span id="card-player-title">Sude Hanım İçin İtiraf Sorusu:</span>
+      </div>
+
+      <!-- Soru & Görev Kutusu (Screenshot 4 Gibi) -->
+      <div class="question-content-box">
+        <p class="main-question-text" id="card-question-text">“Yükleniyor...”</p>
+        <div class="mission-pill-box" id="card-mission-box">
+          <span class="mission-icon">💬</span>
+          <span class="mission-label">GÖREV:</span>
+          <span id="card-mission-text">Mikrofona sesli şekilde karşı tarafa en dürüst cevabını ver!</span>
+        </div>
+      </div>
+
+      <!-- Sayac (Screenshot 4 Gibi: ❤️ 30 sn + Başlat + Sıfırla) -->
+      <div class="timer-bar-group">
+        <div class="timer-sec-view">
+          <span class="timer-heart">❤️</span>
+          <span id="card-timer">30</span> sn
+        </div>
+        <div class="timer-btns-wrap">
+          <button class="timer-btn-pill" id="card-timer-start-btn">Başlat</button>
+          <button class="timer-btn-pill" id="card-timer-reset-btn">Sıfırla</button>
+        </div>
+      </div>
+
+      <!-- Eylem Butonları (Screenshot 4 Gibi) -->
+      <div class="modal-actions-row">
+        <button class="act-btn success" id="card-success-btn">
+          <span>✅ Söyledi / Yaptı (+10 Puan)</span>
+        </button>
+        <button class="act-btn pass" id="card-pass-btn">
+          <span>⏭️ Pas Geç (Sıra Geçer)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3 GİZEMLİ MOLA KUTUSU ================= -->
+  <div id="mystery-modal" class="modal-overlay hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header-row">
+        <span class="category-badge-pill badge-flirt">🎁 3 GİZEMLİ MOLA KUTUSU</span>
+        <button class="modal-close-btn" data-close="mystery-modal">✕</button>
+      </div>
+
+      <div class="speaker-callout">
+        <span>Sıradaki: <strong id="mystery-speaker">Sude Hanım</strong> • Bir kutu seç, mola sürprizini aç!</span>
+      </div>
+
+      <div class="boxes-container">
+        <div class="mystery-box-item" id="mbox-0">
+          <div class="m-box-icon">🎁</div>
+          <div class="m-box-label">1. KUTU</div>
+          <div class="m-box-hint">DOKUN VE AÇ</div>
+        </div>
+        <div class="mystery-box-item" id="mbox-1">
+          <div class="m-box-icon">🎁</div>
+          <div class="m-box-label">2. KUTU</div>
+          <div class="m-box-hint">DOKUN VE AÇ</div>
+        </div>
+        <div class="mystery-box-item" id="mbox-2">
+          <div class="m-box-icon">🎁</div>
+          <div class="m-box-label">3. KUTU</div>
+          <div class="m-box-hint">DOKUN VE AÇ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SÜRPRİZ & BİLDİRİM MODALI ================= -->
+  <div id="penalty-modal" class="modal-overlay hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="coffee-penalty-box">
+        <div class="coffee-penalty-icon" id="penalty-icon">🎁</div>
+        <h3 class="coffee-penalty-title" id="penalty-title">MOLA SÜRPRİZİ!</h3>
+        <p class="coffee-penalty-desc" id="penalty-desc">
+          Mola sürprizi açıldı!
+        </p>
+      </div>
+      <button class="act-btn success" id="penalty-ok-btn" style="width: 100%;">
+        👍 Devam Et
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= GEÇMİŞ MODALI ================= -->
+  <div id="history-modal" class="modal-overlay hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header-row">
+        <h3>📜 OYUN GEÇMİŞİ</h3>
+        <button class="modal-close-btn" data-close="history-modal">✕</button>
+      </div>
+      <div class="history-list" id="history-list">
+        <div style="text-align:center; color:var(--text-muted); padding:20px;">Henüz kart oynanmadı. Çarkı çevirerek başlayın!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MİSAFİR OYUNCU İSİM MODALI ================= -->
+  <div id="guest-name-modal" class="modal-overlay hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-dialog" style="max-width: 430px; text-align: center;">
+      <div class="modal-header-row" style="justify-content: center; position: relative;">
+        <span class="category-badge-pill badge-flirt">🌸 MİSAFİR OYUNCU GİRİŞİ</span>
+        <button class="modal-close-btn" data-close="guest-name-modal" style="position: absolute; right: 0;">✕</button>
+      </div>
+      <div style="font-size: 2.3rem; margin: 4px 0;">👱‍♀️ ✨</div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff;">Misafir Oyuncunun İsmi</h3>
+      <p style="font-size: 0.86rem; color: var(--text-muted); line-height: 1.45; margin: 4px 0 10px;">
+        Kiminle ders molası veriyorsunuz? İsmini yazın, oyun otomatik olarak sonuna <strong style="color: var(--rose-light);">"... Hanım"</strong> ekleyecektir.
+      </p>
+      <div style="margin-bottom: 14px;">
+        <input type="text" id="guest-name-input" class="player-name-input-field" placeholder="Örn: Sude, Ayşe, Merve..." maxlength="25" autocomplete="off" />
+      </div>
+      <button class="act-btn success" id="guest-name-submit-btn" style="width: 100%;">
+        ✨ Kaydet & Başla
+      </button>
+    </div>
+  </div>
+
+  <!-- Harici JavaScript Oyun Motoru -->
+  <script src="yeniarkadas.js"></script>
+</body>
+</html>
